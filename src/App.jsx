@@ -5,7 +5,6 @@ import LazyImage from "./components/LazyImage";
 
 // todo:
 // - halaman di-refresh, data atau state pada halaman itu tidak kembali ke state awal
-// - fixed position
 
 function App() {
   const [isVisible, setIsVisible] = useState(true);
@@ -92,7 +91,7 @@ function App() {
                   width="95"
                   alt="Suitmedia Digital Agency"
                   className="filter brightness-0 invert"
-                  src="http://suitmedia.com/_ipx/w_200&f_webp&q_100/assets/img/site-logo.png"
+                  src="https://suitmedia.com/_ipx/w_200&f_webp&q_100/assets/img/site-logo.png"
                 />
               </a>
             </div>
@@ -141,7 +140,7 @@ function App() {
 
       {/* <!-- Main Content --> */}
       <main className="mx-auto">
-        <section className="py-32 bg-white banner">
+        <section className="py-32 bg-white bg-fixed bg-center bg-cover banner">
           <div className="w-full flex flex-col items-center text-white justify-center">
             <h1 className="text-5xl font-normal">Ideas</h1>
             <p className="text-lg">Where all our great things begin</p>
