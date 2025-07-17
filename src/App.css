@@ -1,0 +1,58 @@
+.active {
+  content: " ";
+  display: block;
+  border-bottom: 3px solid white;
+}
+
+.banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300%;
+  height: 100%;
+  background: #fff;
+  opacity: 1;
+  transform: skew(-85deg) translateX(50%);
+  z-index: 5;
+}
+
+.banner::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300%;
+  height: 100%;
+  background: #000;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+.banner > * {
+  z-index: 40;
+}
+
+.banner {
+  position: relative;
+  min-height: 70vh;
+  background-image: url(https://images.unsplash.com/photo-1688722389626-a536f8452b8f?auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzV8fGxpbmUlMjBhcnR8ZW58MHwwfDB8fHwy);
+  background-size: cover;
+  /* filter: brightness(50%); */
+  display: flex;
+  overflow-x: hidden;
+}
+
+.select-border {
+  /* border: 1px solid #ddd; */
+  /* border-radius: 8px; */
+  display: inline-block;
+}
+
+select {
+  /* padding: 8px 0px; */
+  border: none;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  background-color: transparent;
+}
