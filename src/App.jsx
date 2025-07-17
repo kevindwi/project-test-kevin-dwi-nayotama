@@ -42,8 +42,6 @@ function App() {
 
       const res = await axios.get(url, {
         headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124 Safari/537.36",
           Accept: "application/json",
         },
       });
@@ -192,7 +190,10 @@ function App() {
                   >
                     <a href="#">
                       <LazyImage
-                        src={changeHostname(post.medium_image[0].url)}
+                        src={
+                          post?.medium_image[0]?.url &&
+                          changeHostname(post.medium_image[0].url)
+                        }
                         alt={post.slug}
                         className="rounded-t-lg w-full h-[180px] bg-cover"
                       ></LazyImage>
