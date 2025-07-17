@@ -34,17 +34,6 @@ function App() {
     setSort(event.target.value);
   };
 
-  const handleScroll = () => {
-    if (window.scrollY > lastScrollY) {
-      // Scrolling down
-      setIsVisible(false);
-    } else {
-      // Scrolling up
-      setIsVisible(true);
-    }
-    setLastScrollY(window.scrollY);
-  };
-
   const getData = async (url) => {
     try {
       if (!url) return;
@@ -63,9 +52,21 @@ function App() {
   };
 
   useEffect(() => {
+    console.log("i fire once");
     getData(
       `https://suitmedia-backend.suitdev.com/api/ideas?page[number]=1&page[size]=${pageSize}&append[]=small_image&append[]=medium_image&sort=${sort}`,
     );
+
+    const handleScroll = () => {
+      if (window.scrollY > lastScrollY) {
+        // Scrolling down
+        setIsVisible(false);
+      } else {
+        // Scrolling up
+        setIsVisible(true);
+      }
+      setLastScrollY(window.scrollY);
+    };
 
     window.addEventListener("scroll", handleScroll);
     return () => {
