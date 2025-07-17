@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import "./App.css";
 import axios from "axios";
 import LazyImage from "./components/LazyImage";
@@ -9,6 +9,8 @@ import LazyImage from "./components/LazyImage";
 function App() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(1);
+
+  const lastScrollYRef = useRef(0);
 
   const [data, setData] = useState(null);
   const [pageSize, setPageSize] = useState(10);
@@ -39,7 +41,7 @@ function App() {
       if (!url) return;
 
       const res = await axios.get(url, {
-        header: {
+        headers: {
           "User-Agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124 Safari/537.36",
           Accept: "application/json",
@@ -47,7 +49,7 @@ function App() {
       });
       setData(res.data);
     } catch (err) {
-      console.log(err);
+      console.error("Error fetching data:", err.response || err.message || err);
     }
   }, []);
 
@@ -58,20 +60,12 @@ function App() {
     );
 
     const handleScroll = () => {
-      if (window.scrollY > lastScrollY) {
-        // Scrolling down
-        setIsVisible(false);
-      } else {
-        // Scrolling up
-        setIsVisible(true);
-      }
-      setLastScrollY(window.scrollY);
+      const currentY = window.scrollY;
+      setIsVisible(currentY < lastScrollYRef.current);
+      lastScrollYRef.current = currentY;
     };
-
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY, pageSize, sort, getData]);
 
   // console.log(data);
@@ -163,6 +157,7 @@ function App() {
                     <select
                       className="rounded-full px-1 py-1"
                       onChange={handleSetPageSize}
+                      value={pageSize}
                     >
                       <option value={10}>10</option>
                       <option value={20}>20</option>
@@ -177,6 +172,7 @@ function App() {
                     <select
                       className="rounded-full px-1 py-1"
                       onChange={handleSetSort}
+                      value={sort}
                     >
                       <option value={"published_at"}>Newest</option>
                       <option value={"-published_at"}>Oldest</option>
@@ -220,7 +216,7 @@ function App() {
               <a
                 className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200`}
                 // href={data && data.links.first}
-                onClick={() => getData(data && data.links.first)}
+                onClick={() => data?.links?.first && getData(data.links.first)}
               >
                 First
               </a>
