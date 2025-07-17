@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import "./App.css";
 import axios from "axios";
 import LazyImage from "./components/LazyImage";
@@ -34,7 +34,7 @@ function App() {
     setSort(event.target.value);
   };
 
-  const getData = async (url) => {
+  const getData = useCallback(async (url) => {
     try {
       if (!url) return;
 
@@ -49,7 +49,7 @@ function App() {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     console.log("i fire once");
@@ -72,7 +72,7 @@ function App() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [lastScrollY, pageSize, sort]);
+  }, [lastScrollY, pageSize, sort, getData]);
 
   // console.log(data);
 
