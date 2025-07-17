@@ -8,7 +8,7 @@ import LazyImage from "./components/LazyImage";
 
 function App() {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(1);
+  // const [lastScrollY, setLastScrollY] = useState(1);
 
   const lastScrollYRef = useRef(0);
 
@@ -66,7 +66,7 @@ function App() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY, pageSize, sort, getData]);
+  }, [getData, pageSize, sort]);
 
   // console.log(data);
 
@@ -228,9 +228,9 @@ function App() {
                     key={index}
                     className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
                     // href={link.url}
-                    onClick={() => getData(link.url)}
+                    onClick={() => link?.url && getData(link.url)}
                   >
-                    <>{decodeHTML(link.label)}</>
+                    <>{link && decodeHTML(link.label)}</>
                   </a>
                 ))}
             </div>
@@ -238,7 +238,7 @@ function App() {
               <a
                 className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200`}
                 // href={data && data.links.last}
-                onClick={() => getData(data && data.links.last)}
+                onClick={() => data?.links?.last && getData(data.links.last)}
               >
                 Last
               </a>
