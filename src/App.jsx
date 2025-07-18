@@ -8,7 +8,6 @@ import LazyImage from "./components/LazyImage";
 
 function App() {
   const [isVisible, setIsVisible] = useState(true);
-  // const [lastScrollY, setLastScrollY] = useState(1);
 
   const lastScrollYRef = useRef(0);
 
@@ -26,6 +25,28 @@ function App() {
     const parser = new DOMParser();
     const decoded = parser.parseFromString(html, "text/html");
     return decoded.documentElement.textContent;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const days = date.getDate();
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const year = date.getFullYear().toString();
+    const month = months[date.getMonth()];
+    return `${days} ${month} ${year}`;
   };
 
   const handleSetPageSize = (event) => {
@@ -54,7 +75,7 @@ function App() {
   useEffect(() => {
     console.log("i fire once");
     getData(
-      `https://suitmedia-backend.suitdev.com/api/ideas?page[number]=1&page[size]=${pageSize}&append[]=small_image&append[]=medium_image&sort=${sort}`,
+      `https://suitmedia-backend.suitdev.com/api/ideas?page[number]=1&page[size]=${pageSize}&append[]=small_image&append[]=medium_image&sort=${sort}&`,
     );
 
     const handleScroll = () => {
@@ -180,7 +201,7 @@ function App() {
               </div>
             </div>
 
-            {/*  */}
+            {/* Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {data &&
                 data.data.map((post) => (
@@ -198,9 +219,13 @@ function App() {
                         className="rounded-t-lg w-full h-[180px] bg-cover"
                       ></LazyImage>
                     </a>
+
                     <div className="p-5">
+                      <span className="text-sm text-gray-500">
+                        {formatDate(post.updated_at)}
+                      </span>
                       <a href="#">
-                        <h5 className="mb-2 text-xl font-medium tracking-tight text-gray-900 line-clamp-3">
+                        <h5 className="text-xl font-medium tracking-tight text-gray-900 line-clamp-3">
                           {post.title}
                         </h5>
                       </a>
@@ -216,7 +241,6 @@ function App() {
             <div className="wt-button-font order-2 col-span-2 flex justify-end gap-2">
               <a
                 className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200`}
-                // href={data && data.links.first}
                 onClick={() => data?.links?.first && getData(data.links.first)}
               >
                 First
@@ -224,21 +248,45 @@ function App() {
             </div>
             <div className="order-1 col-span-4 flex justify-center gap-1 sm:order-2">
               {data &&
-                data.meta.links.map((link, index) => (
-                  <a
-                    key={index}
-                    className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
-                    // href={link.url}
-                    onClick={() => link?.url && getData(link.url)}
-                  >
-                    <>{link && decodeHTML(link.label)}</>
-                  </a>
-                ))}
+                data.meta.links.map((link, index) => {
+                  let d = data.meta.links;
+
+                  if (index == 0)
+                    return (
+                      <a
+                        key={index}
+                        className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
+                        onClick={() => link?.url && getData(link.url)}
+                      >
+                        <>&laquo;</>
+                      </a>
+                    );
+
+                  if (index == d.length - 1)
+                    return (
+                      <a
+                        key={index}
+                        className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
+                        onClick={() => link?.url && getData(link.url)}
+                      >
+                        <>&raquo;</>
+                      </a>
+                    );
+
+                  return (
+                    <a
+                      key={index}
+                      className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
+                      onClick={() => link?.url && getData(link.url)}
+                    >
+                      <>{link && decodeHTML(link.label)}</>
+                    </a>
+                  );
+                })}
             </div>
             <div className="wt-button-font order-2 col-span-2 flex items-center gap-2">
               <a
                 className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200`}
-                // href={data && data.links.last}
                 onClick={() => data?.links?.last && getData(data.links.last)}
               >
                 Last
