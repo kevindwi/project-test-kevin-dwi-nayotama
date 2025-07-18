@@ -17,8 +17,8 @@ function App() {
   const sort = searchParams.get("sort") || "-published_at";
 
   const updateQuery = (params) => {
-    if (params.page <= 1) return;
-    if (params.size <= 10) return;
+    if (params.page < 1) return;
+    if (params.size < 10) return;
 
     setSearchParams({
       page,
@@ -148,6 +148,7 @@ function App() {
                   <span className="text-gray-600 mr-2">Show per page:</span>
                   <div className="select-border bg-white border border-gray-300 rounded-full text-gray-700">
                     <select
+                      name="page-size"
                       className="rounded-full px-1 py-1"
                       onChange={handleSetPageSize}
                       value={pageSize}
@@ -163,6 +164,7 @@ function App() {
                   <span className="text-gray-600 mr-2">Sort by:</span>
                   <div className="select-border bg-white border border-gray-300 rounded-full text-gray-700">
                     <select
+                      name="sort"
                       className="rounded-full px-1 py-1"
                       onChange={handleSetSort}
                       value={sort}
@@ -231,8 +233,6 @@ function App() {
                         key={index}
                         className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
                         onClick={() => {
-                          // const url = new URL(link.url);
-                          // const newPage = url.searchParams.get("page[number]");
                           updateQuery({ page: page - 1 });
                         }}
                       >
