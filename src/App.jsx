@@ -1,65 +1,44 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import "./App.css";
 import axios from "axios";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import "./App.css";
 import LazyImage from "./components/LazyImage";
-
-// todo:
-// - halaman di-refresh, data atau state pada halaman itu tidak kembali ke state awal
+import { changeHostname, decodeHTML, formatDate } from "./utils/util";
 
 function App() {
+  const [data, setData] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isVisible, setIsVisible] = useState(true);
 
   const lastScrollYRef = useRef(0);
 
-  const [data, setData] = useState(null);
-  const [pageSize, setPageSize] = useState(10);
-  const [sort, setSort] = useState("published_at");
+  const page = parseInt(searchParams.get("page") || "1");
+  const pageSize = parseInt(searchParams.get("size") || "10");
+  const sort = searchParams.get("sort") || "-published_at";
 
-  const changeHostname = (oldUrl) => {
-    var url = new URL(oldUrl);
-    url.hostname = "suitmedia.static-assets.id";
-    return url.href;
-  };
+  const updateQuery = (params) => {
+    if (params.page <= 1) return;
+    if (params.size <= 10) return;
 
-  const decodeHTML = (html) => {
-    const parser = new DOMParser();
-    const decoded = parser.parseFromString(html, "text/html");
-    return decoded.documentElement.textContent;
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const days = date.getDate();
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const year = date.getFullYear().toString();
-    const month = months[date.getMonth()];
-    return `${days} ${month} ${year}`;
+    setSearchParams({
+      page,
+      size: pageSize,
+      sort,
+      ...params,
+    });
   };
 
   const handleSetPageSize = (event) => {
-    setPageSize(event.target.value);
+    updateQuery({ size: event.target.value, page: 1 });
   };
 
   const handleSetSort = (event) => {
-    setSort(event.target.value);
+    updateQuery({ sort: event.target.value, page: 1 });
   };
 
-  const getData = useCallback(async (url) => {
+  const getData = useCallback(async () => {
     try {
-      if (!url) return;
+      const url = `https://suitmedia-backend.suitdev.com/api/ideas?page[number]=${page}&page[size]=${pageSize}&append[]=small_image&append[]=medium_image&sort=${sort}`;
 
       const res = await axios.get(url, {
         headers: {
@@ -70,13 +49,10 @@ function App() {
     } catch (err) {
       console.error("Error fetching data:", err.response || err.message || err);
     }
-  }, []);
+  }, [page, pageSize, sort]);
 
   useEffect(() => {
-    console.log("i fire once");
-    getData(
-      `https://suitmedia-backend.suitdev.com/api/ideas?page[number]=1&page[size]=${pageSize}&append[]=small_image&append[]=medium_image&sort=${sort}&`,
-    );
+    getData();
 
     const handleScroll = () => {
       const currentY = window.scrollY;
@@ -85,9 +61,7 @@ function App() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [getData, pageSize, sort]);
-
-  // console.log(data);
+  }, [getData, page, pageSize, sort]);
 
   return (
     <div>
@@ -241,7 +215,7 @@ function App() {
             <div className="wt-button-font order-2 col-span-2 flex justify-end gap-2">
               <a
                 className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200`}
-                onClick={() => data?.links?.first && getData(data.links.first)}
+                onClick={() => updateQuery({ page: 1 })}
               >
                 First
               </a>
@@ -256,7 +230,11 @@ function App() {
                       <a
                         key={index}
                         className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
-                        onClick={() => link?.url && getData(link.url)}
+                        onClick={() => {
+                          // const url = new URL(link.url);
+                          // const newPage = url.searchParams.get("page[number]");
+                          updateQuery({ page: page - 1 });
+                        }}
                       >
                         <>&laquo;</>
                       </a>
@@ -267,7 +245,11 @@ function App() {
                       <a
                         key={index}
                         className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
-                        onClick={() => link?.url && getData(link.url)}
+                        onClick={() => {
+                          if (page <= d.length - 3) {
+                            updateQuery({ page: page + 1 });
+                          }
+                        }}
                       >
                         <>&raquo;</>
                       </a>
@@ -277,7 +259,11 @@ function App() {
                     <a
                       key={index}
                       className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200 ${link.active ? "bg-orange-500 text-white" : ""}`}
-                      onClick={() => link?.url && getData(link.url)}
+                      onClick={() => {
+                        const url = new URL(link.url);
+                        const newPage = url.searchParams.get("page[number]");
+                        updateQuery({ page: newPage });
+                      }}
                     >
                       <>{link && decodeHTML(link.label)}</>
                     </a>
@@ -287,7 +273,7 @@ function App() {
             <div className="wt-button-font order-2 col-span-2 flex items-center gap-2">
               <a
                 className={`rounded-lg flex items-center gap-2 border border-transparent px-3 py-1 transition duration-150 ease-in-out hover:bg-orange-200`}
-                onClick={() => data?.links?.last && getData(data.links.last)}
+                onClick={() => updateQuery({ page: data.meta.last_page })}
               >
                 Last
               </a>
